@@ -13,23 +13,26 @@ class SSAData(BaseModel):
 
 @app.post("/ssa/verify")
 async def verify_ssa(data: SSAData):
-    # 1. GOVERNANCE
+    # 1. GOVERNANCE CHECK
     if not data.data_signature.startswith("SOVEREIGN"):
         raise HTTPException(status_code=403, detail="SECURITY_VIOLATION: Untrusted Source")
 
-    # 2. PHYSICS
+    # 2. PHYSICS GUARDRAILS
+    # Reject sub-orbital data
     if data.semi_major_axis < 6500:
         raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Sub-orbital altitude")
-    if data.eccentricity >= 1.0:
-        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Non-Keplerian/Hyperbolic trajectory")
-
-    # 3. INTELLIGENCE (Classification)
-    regime = "LEO" if data.semi_major_axis < 8371 else "GEO/MEO"
     
+    # Reject non-Keplerian eccentricity (Must be 0 <= e < 1)
+    if not (0 <= data.eccentricity < 1.0):
+        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Invalid Eccentricity Range")
+    
+    # Reject invalid inclination (Must be 0 <= i <= 180)
+    if not (0 <= data.inclination <= 180):
+        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Inclination out of bounds")
+
     return {
         "status": "VERIFIED",
-        "regime": regime,
         "integrity": "HIGH",
-        "engine": "KOSHATRACK-V2-TACTICAL",
+        "engine": "KOSHATRACK-V1-HARDENED",
         "timestamp": datetime.now().isoformat()
     }
