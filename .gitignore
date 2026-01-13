@@ -13,3 +13,4 @@ __pycache__/
 *.backup
 *.log
 mission_logs.txt
+.venv/
