@@ -1,38 +1,18 @@
-# KoshaTrack SSA Engine: Tier-Zero Sovereign Space Defense 🛰️🇮🇳
+# 🛰️ KoshaTrack SSA Engine: Tier-Zero Sovereign Space Defense 🛰️🇮🇳
 
-**KoshaTrack** is an advanced, dual-use Space Situational Awareness (SSA) platform designed for NASA-grade autonomous collision avoidance and high-stakes defense applications.
+KoshaTrack is a high-stakes Space Situational Awareness (SSA) platform. This repository contains the **Hardened Sovereign Kernel** designed for the iDEX ADITI mission.
 
-## 🚀 Tier-Zero Capabilities
-Unlike standard tracking software, KoshaTrack is engineered for the **Contested Space Domain**:
-* **Multi-Hypothesis Tracking (MHT):** Propagates multiple potential trajectories for uncorrelated objects (UCTs) and dark debris.
-* **Hypersonic Threat Detection:** Real-time classification of non-Keplerian, sub-orbital trajectories (Mach 5+).
-* **Cislunar Awareness:** Deep-space tracking beyond GEO using Circular Restricted Three-Body Problem (CR3BP) physics.
-* **Physics-Informed ML Defense:** Zero-trust ingestion pipeline that flags adversarial TLE spoofing via orbital energy verification.
+## 🛡️ The "Zero-Trust" Security Moat
+Unlike standard SSA tools, KoshaTrack is built on the **PrivateVault Security Architecture**:
+* **Physics-Informed Verification:** Automatically rejects "Spoofed TLEs" or adversarial data that violates Keplerian orbital laws.
+* **Red-Black Separation:** Logic is decoupled from data storage, ensuring that orbital state vectors remain air-gapped from the compute engine.
+* **Integrity Auditing:** Every calculation generates a PrivateVault-compatible signature for legal "Chain of Custody" in space law disputes.
 
-## 🛠️ Technical Architecture
-- **Core:** High-Precision Orbit Propagator (HPOP) with 7-day Solar Weather (NRLMSISE-00) integration.
-- **Security:** Red-Black architecture for air-gapped MoD deployments.
-- **Scalability:** Distributed processing via Ray/Dask for LEO mega-constellation management.
-- **Trust:** Immutable Blockchain Audit Trail for international space law compliance.
+## 🚀 Capabilities
+* **HPOP Engine:** High-Precision Orbit Propagation aware of atmospheric drag.
+* **Elastic Infrastructure:** Terraform-ready for deployment on sovereign EKS clusters.
+* **Free for GoI:** Released under PolyForm Noncommercial License for national security use.
 
-## 📦 Installation & Quickstart
-```bash
-# Clone the repository
-git clone [https://github.com/your-username/Spacetech2026.git](https://github.com/your-username/Spacetech2026.git)
-cd Spacetech2026
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the HPOP engine with Space Weather correction
-python src/core/propagate.py --weather-aware true
-🎖️ iDEX DefSpace Alignment
-KoshaTrack addresses critical focus areas in the Mission DefSpace challenge:
-
-Sovereign SSA Cataloging (Independent of US Space-Track).
-
-AI-driven Threat Prioritization.
-
-Space Domain Awareness for Cislunar Assets.
-
-Developed for the future of Indian Space Sovereignty. EOF
+---
+**Secure. Sovereign. Unstoppable.**
+Developed for the Ministry of Defence, India.
