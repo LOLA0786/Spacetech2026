@@ -13,22 +13,23 @@ class SSAData(BaseModel):
 
 @app.post("/ssa/verify")
 async def verify_ssa(data: SSAData):
-    # 1. GOVERNANCE CHECK (PrivateVault Armor)
-    if data.data_signature == "NONE" or not data.data_signature.startswith("SOVEREIGN"):
-        raise HTTPException(status_code=403, detail="SECURITY_VIOLATION: Missing or Invalid Sovereign Signature")
+    # 1. GOVERNANCE
+    if not data.data_signature.startswith("SOVEREIGN"):
+        raise HTTPException(status_code=403, detail="SECURITY_VIOLATION: Untrusted Source")
 
-    # 2. PHYSICS CHECK (KoshaTrack Brain)
-    # Earth Radius (~6371km) + Atmosphere (~130km) = ~6500km threshold
+    # 2. PHYSICS
     if data.semi_major_axis < 6500:
-        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Sub-orbital/Spoofed Semi-Major Axis detected")
-    
-    # Eccentricity check (e < 1 for closed orbit)
+        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Sub-orbital altitude")
     if data.eccentricity >= 1.0:
-        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Non-Keplerian/Hyperbolic trajectory detected")
+        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Non-Keplerian/Hyperbolic trajectory")
 
+    # 3. INTELLIGENCE (Classification)
+    regime = "LEO" if data.semi_major_axis < 8371 else "GEO/MEO"
+    
     return {
         "status": "VERIFIED",
+        "regime": regime,
         "integrity": "HIGH",
-        "engine": "KOSHATRACK-V1-HARDENED",
+        "engine": "KOSHATRACK-V2-TACTICAL",
         "timestamp": datetime.now().isoformat()
     }
