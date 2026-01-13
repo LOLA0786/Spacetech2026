@@ -2,33 +2,33 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from datetime import datetime
 
-app = FastAPI(title="KoshaTrack Sovereign SSA", version="1.0.0")
+app = FastAPI()
 
-class OrbitalState(BaseModel):
+class SSAData(BaseModel):
     norad_id: int
-    semi_major_axis: float  
+    semi_major_axis: float
     eccentricity: float
     inclination: float
-    data_signature: str 
+    data_signature: str
 
 @app.post("/ssa/verify")
-async def verify_state(state: OrbitalState):
-    """
-    Sovereign Validation Logic:
-    Ensures state vectors comply with Earth-Centric orbital mechanics.
-    """
-    # Loophole Fix: Earth Radius is ~6371km. 
-    # Anything below 6500km (including atmosphere) is a re-entry or spoof.
-    if state.semi_major_axis < 6500:
-        raise HTTPException(status_code=403, detail="SECURITY_VIOLATION: Sub-orbital/Spoofed SMA")
+async def verify_ssa(data: SSAData):
+    # 1. GOVERNANCE CHECK (PrivateVault Armor)
+    if data.data_signature == "NONE" or not data.data_signature.startswith("SOVEREIGN"):
+        raise HTTPException(status_code=403, detail="SECURITY_VIOLATION: Missing or Invalid Sovereign Signature")
+
+    # 2. PHYSICS CHECK (KoshaTrack Brain)
+    # Earth Radius (~6371km) + Atmosphere (~130km) = ~6500km threshold
+    if data.semi_major_axis < 6500:
+        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Sub-orbital/Spoofed Semi-Major Axis detected")
     
-    # Loophole Fix: Eccentricity must be < 1 for a stable closed orbit.
-    if state.eccentricity >= 1.0 or state.eccentricity < 0:
-        raise HTTPException(status_code=403, detail="SECURITY_VIOLATION: Non-Keplerian Trajectory")
+    # Eccentricity check (e < 1 for closed orbit)
+    if data.eccentricity >= 1.0:
+        raise HTTPException(status_code=403, detail="PHYSICS_VIOLATION: Non-Keplerian/Hyperbolic trajectory detected")
 
     return {
         "status": "VERIFIED",
         "integrity": "HIGH",
-        "engine": "KOSHATRACK-V1",
-        "timestamp": datetime.utcnow().isoformat()
+        "engine": "KOSHATRACK-V1-HARDENED",
+        "timestamp": datetime.now().isoformat()
     }
