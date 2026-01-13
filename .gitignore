@@ -1,9 +1,15 @@
+# Ignore AWS and Terraform binaries
+aws/
 .terraform/
-.terraform.lock.hcl
-*.tfstate
-*.tfstate.backup
-awscliv2.zip
-aws/
+*.tfstate*
+.env
+
+# Ignore Python artifacts
 __pycache__/
-.venv/
-aws/
+*.pyc
+.ipynb_checkpoints/
+
+# Ignore backups and logs
+*.backup
+*.log
+mission_logs.txt
