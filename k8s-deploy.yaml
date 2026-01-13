@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: koshatrack-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: koshatrack
+  template:
+    metadata:
+      labels:
+        app: koshatrack
+    spec:
+      containers:
+      - name: engine
+        image: python:3.11-slim
+        workingDir: /app
+        command: ["/bin/sh", "-c"]
+        # The 'args' below installs deps and starts the server
+        args:
+          - "pip install fastapi uvicorn pydantic requests numpy && uvicorn main:app --host 0.0.0.0 --port 8000"
+        volumeMounts:
+        - name: code-volume
+          mountPath: /app
+        ports:
+        - containerPort: 8000
+      volumes:
+      - name: code-volume
+        configMap:
+          name: kosha-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: koshatrack-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: koshatrack
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000

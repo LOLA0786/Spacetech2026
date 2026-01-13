@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic
+numpy
+scikit-learn
+joblib
+sgp4
+# blockchain optional (install later)
+# web3
+# eth-account
+twilio

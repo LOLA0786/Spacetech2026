@@ -1,0 +1,118 @@
+import os
+import json
+import numpy as np
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import Response
+from datetime import datetime
+from pydantic import BaseModel
+from typing import List, Dict
+
+# High-Fidelity SSA Modules
+from ssa_engine.physics.propagator_hpop import HighPrecisionPropagator
+from ssa_engine.analysis.conjunction import ConjunctionEngine
+from ssa_engine.analysis.maneuver import ManeuverEngine
+from ssa_engine.physics.fuel_logic import FuelCalculator
+from ssa_engine.analysis.probability_v2 import ProbabilityEngineV2
+from ssa_engine.analysis.decision import DecisionAuthority
+from ssa_engine.physics.execution import ManeuverExecutor
+from ssa_engine.analysis.cdm_generator import CDMGenerator
+from ssa_engine.data.spacetrack_client import SpaceTrackClient
+
+app = FastAPI(title="Spacetech 2026 - Sovereign SOC")
+
+# Initialize Global Engines
+hpop = HighPrecisionPropagator()
+cola_engine = ConjunctionEngine(collision_threshold_km=30.0)
+mre = ManeuverEngine(hpop)
+fuel_calc = FuelCalculator(total_fuel_capacity_kg=50.0)
+prob_engine = ProbabilityEngineV2()
+decision_auth = DecisionAuthority(pc_threshold=0.0001)
+executor = ManeuverExecutor()
+cdm_gen = CDMGenerator()
+
+# Credentials & State
+ST_USER = os.getenv("SPACETRACK_USER", "demo@spacetech.com")
+ST_PASS = os.getenv("SPACETRACK_PASS", "demo_pass")
+st_client = SpaceTrackClient(user=ST_USER, password=ST_PASS)
+
+observations = {}
+DEBRIS_CATALOG = [{"id": "THREAT-ALPHA", "x": -2695.0, "y": 1920.0, "z": 7555.0, "name": "DEBRIS_999"}]
+
+@app.post("/ssa/ingest/live/{norad_id}")
+async def ingest_live_satellite(norad_id: str):
+    tle_data = await st_client.get_latest_tle(norad_id)
+    if not tle_data:
+        raise HTTPException(status_code=404, detail="Space-Track match not found")
+    
+    obs = {
+        "source": "SPACE_TRACK_LIVE",
+        "object_id": norad_id,
+        "name": tle_data.get('OBJECT_NAME'),
+        "position": {"x": -1208.0, "y": 5525.1, "z": 3211.9}, # Sample Cartesian conversion
+        "velocity": {"vx": -2.4, "vy": 5.2, "vz": 6.6},
+        "confidence": 0.99,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    observations[norad_id] = [obs]
+    return {"status": "Live Data Synced", "object_name": obs['name']}
+
+@app.post("/ssa/fusion/fuse/{object_id}")
+async def fuse_and_analyze(object_id: str):
+    if object_id not in observations: raise HTTPException(status_code=404)
+    
+    current_state = observations[object_id][-1]
+    
+    # 1. High Precision Prediction
+    future_state = hpop.propagate(current_state['position'], current_state['velocity'], 1800)
+    
+    # 2. Risk Assessment
+    risks = cola_engine.check_close_approach(future_state, DEBRIS_CATALOG)
+    
+    threat_assessment = []
+    for risk in risks:
+        pc = prob_engine.calculate_pc(risk['distance_km'], sigma_combined=2.5)
+        action = mre.calculate_avoidance({"position": current_state['position'], "velocity": current_state['velocity']}, risk, 1800)
+        cost = fuel_calc.estimate_cost(500, action.get("recommended_dv_kms", 0))
+        decision = decision_auth.evaluate(pc, cost)
+        
+        threat_assessment.append({
+            "threat_id": risk['debris_id'],
+            "collision_probability": pc,
+            "decision": decision,
+            "fuel_impact": cost,
+            "recommended_dv_kms": action.get("recommended_dv_kms")
+        })
+
+    return {"status": "ok", "autonomous_commands": threat_assessment}
+
+@app.post("/ssa/mission/execute/{object_id}")
+async def execute_burn(object_id: str, dv_kms: float):
+    latest_obs = observations[object_id][-1]
+    new_velocity = executor.apply_burn(latest_obs['velocity'], dv_kms)
+    
+    new_entry = latest_obs.copy()
+    new_entry['velocity'] = new_velocity
+    new_entry['source'] = "AUTONOMOUS_BURN_COMMIT"
+    observations[object_id].append(new_entry)
+    
+    return {"status": "maneuver_executed", "new_velocity": new_velocity}
+
+@app.get("/ssa/export/cdm/{object_id}")
+async def export_cdm(object_id: str):
+    # Generates standard XML for NASA/Space Force
+    xml_data = cdm_gen.generate_xml(
+        object_a={"name": "SAT_PRIMARY", "id": object_id},
+        object_b={"name": "DEBRIS_ALPHA", "id": "99999"},
+        tca=datetime.utcnow().isoformat(),
+        miss_distance=1.2,
+        pc=0.0054
+    )
+    return Response(content=xml_data, media_type="application/xml")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# Add insurance routes
+from src.commercial.insurance_api import router as insurance_router
+app.include_router(insurance_router)

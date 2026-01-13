@@ -1,0 +1,8 @@
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+awscliv2.zip
+aws/
+__pycache__/
+.venv/

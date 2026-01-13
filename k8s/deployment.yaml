@@ -1,0 +1,5 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: koshatrack-tier-zero
+# Feature 20: Production scalability
