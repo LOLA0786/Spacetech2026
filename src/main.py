@@ -53,19 +53,33 @@ except Exception as e:
 # SpaceTrack placeholder (keep for future)
 
 app = FastAPI(
-    app.state.last_propagation_time = None
+
+# Live status tracking (FastAPI best practice)
+app.state.last_propagation_time = None
     title="KoshaTrack SSA Engine",
-    app.state.last_propagation_time = None
+
+# Live status tracking (FastAPI best practice)
+app.state.last_propagation_time = None
     description="Tier-Zero Sovereign Space Situational Awareness Platform",
-    app.state.last_propagation_time = None
+
+# Live status tracking (FastAPI best practice)
+app.state.last_propagation_time = None
     version=__version__,  # Pulled from package __init__.py
-    app.state.last_propagation_time = None
+
+# Live status tracking (FastAPI best practice)
+app.state.last_propagation_time = None
     docs_url="/docs",
-    app.state.last_propagation_time = None
+
+# Live status tracking (FastAPI best practice)
+app.state.last_propagation_time = None
     redoc_url="/redoc"
-    app.state.last_propagation_time = None
+
+# Live status tracking (FastAPI best practice)
+app.state.last_propagation_time = None
 )
-    app.state.last_propagation_time = None
+
+# Live status tracking (FastAPI best practice)
+app.state.last_propagation_time = None
 
 # CORS - tighten later for zero-trust
 app.add_middleware(
@@ -128,6 +142,7 @@ def demo_iss_position():
     try:
         result = get_iss_position_now()
     app.state.last_propagation_time = datetime.utcnow().isoformat() + "Z"
+    app.state.last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {"success": True, "iss_zarya": result}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid TLE/physics check: {str(e)}")
@@ -138,6 +153,7 @@ def custom_propagate(tle: TLEInput):
         raise HTTPException(status_code=503, detail="Propagation engine not ready")
     try:
         result = propagate_tle(tle.line1, tle.line2)
+    app.state.last_propagation_time = datetime.utcnow().isoformat() + "Z"
     app.state.last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {"success": True, "propagation": result}
     except ValueError as e:
@@ -182,6 +198,7 @@ def demo_iss_position():
         raise HTTPException(status_code=503, detail="Propagation engine not ready")
     try:
         result = get_iss_position_now()
+    app.state.last_propagation_time = datetime.utcnow().isoformat() + "Z"
     app.state.last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {
             "success": True,
@@ -261,7 +278,6 @@ def forecast_conjunctions(hours: int = Query(24, description="Forecast horizon i
 
 @app.get("/")
 def read_root():
-    return {
         "name": "KoshaTrack SSA Engine",
         "version": __version__,
         "status": "operational",
@@ -275,5 +291,23 @@ def read_root():
             "hypersonic_detection": True
         },
         "live_note": "Real-time propagation + Indian sovereign threat screening active 🇮🇳",
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+@app.get("/")
+def read_root():
+    return {
+        "name": "KoshaTrack SSA Engine",
+        "version": __version__,
+        "status": "operational",
+        "last_successful_propagation": app.state.last_propagation_time or "None yet",
+        "capabilities": {
+            "basic_sgp4_propagation": PROPAGATION_AVAILABLE,
+            "physics_verification": PROPAGATION_AVAILABLE,
+            "indian_asset_protection": True,
+            "predictive_forecast": True,
+            "hypersonic_detection": True,
+            "spacetrack_ready": SPACETRACK_AVAILABLE
+        },
+        "live_note": "Tier-Zero operational from Mumbai 🇮🇳 - Protecting Bharatiya Antriksh Domain",
         "timestamp": datetime.utcnow().isoformat() + "Z"
     }
