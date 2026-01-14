@@ -32,12 +32,8 @@ except Exception as e:
     PROPAGATION_AVAILABLE = False
 
 # SpaceTrack placeholder (keep for future)
-try:
-    from ssa_engine.data.spacetrack_client import SpaceTrackClient
-    SPACETRACK_AVAILABLE = True
-except ImportError:
-    print("Warning: SpaceTrack client not available. Running in limited mode.")
-    SPACETRACK_AVAILABLE = False
+from src.ssa_engine.data.spacetrack_client import is_available
+    SPACETRACK_AVAILABLE = is_available()
 
 app = FastAPI(
     title="KoshaTrack SSA Engine",
@@ -67,7 +63,7 @@ def read_root():
             "basic_sgp4_propagation": PROPAGATION_AVAILABLE,
             "physics_verification": PROPAGATION_AVAILABLE,
             "space_weather": True,
-            "spacetrack_integration": SPACETRACK_AVAILABLE,
+            "spacetrack_integration": SPACETRACK_AVAILABLE,  # Full 30k+ object catalog with MoD credentials,
             "mht_tracking": False,
             "hypersonic_detection": False,
             "cislunar_tracking": False
