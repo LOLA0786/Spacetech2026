@@ -1,9 +1,10 @@
 import requests
+import numpy as np
 from datetime import datetime, timedelta
 from sgp4.api import Satrec, jday
 from typing import Optional
 
-# Cache
+# Cache for ISS
 _iss_tle_cache: Optional[tuple[str, str, datetime]] = None
 _cache_valid_until: datetime = datetime.min
 
@@ -35,25 +36,32 @@ def _fetch_fresh_iss_tle() -> tuple[str, str]:
     except Exception as e:
         print(f"Warning: Could not fetch fresh TLE: {e}. Using hardcoded fallback.")
     
-    # Fallback
     return HARDCODED_ISS_LINE1, HARDCODED_ISS_LINE2
 
 def validate_orbital_elements(sat):
-    """Physics-informed zero-trust verification"""
+    """Physics-informed zero-trust verification + anomaly flags"""
+    flags = []
+    
     if not (0 <= sat.ecco < 1):
         raise ValueError(f"Invalid eccentricity {sat.ecco:.6f} - must be 0 ≤ e < 1")
+    if sat.ecco > 0.3:
+        flags.append("Highly eccentric orbit - potential maneuverable/co-orbital threat")
+    if sat.ecco > 0.7:
+        flags.append("CRITICAL: Ballistic/hypersonic reentry trajectory anomaly")
+        
     if sat.no_kozai <= 0:
         raise ValueError("Invalid mean motion (≤ 0)")
     if not (0 <= sat.inclo <= 180):
         raise ValueError(f"Invalid inclination {sat.inclo:.2f}°")
-    # Future: add perigee > 100km check, etc.
+    
+    return flags
 
 def propagate_tle(line1: str, line2: str, dt: Optional[datetime] = None):
     if dt is None:
         dt = datetime.utcnow()
     
     sat = Satrec.twoline2rv(line1, line2)
-    validate_orbital_elements(sat)
+    base_flags = validate_orbital_elements(sat)
     
     jd, fr = jday(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second + dt.microsecond / 1e6)
     error_code, position, velocity = sat.sgp4(jd, fr)
@@ -61,11 +69,20 @@ def propagate_tle(line1: str, line2: str, dt: Optional[datetime] = None):
     if error_code != 0:
         raise ValueError(f"SGP4 propagation error code: {error_code}")
     
+    speed_kms = np.linalg.norm(velocity)
+    if speed_kms > 8.5:
+        base_flags.append(f"Hypervelocity ({speed_kms:.1f} km/s) - potential hypersonic glider/ICBM stage")
+    if speed_kms > 10.0:
+        base_flags.append("CRITICAL: Extreme hypervelocity anomaly - contested domain threat")
+    
     return {
         "timestamp_utc": dt.isoformat() + "Z",
         "source": "custom_tle",
         "position_eci_km": list(position),
-        "velocity_eci_km_s": list(velocity)
+        "velocity_eci_km_s": list(velocity),
+        "speed_kms": round(speed_kms, 3),
+        "eccentricity": round(sat.ecco, 6),
+        "anomaly_flags": base_flags or ["Nominal orbit"]
     }
 
 def get_iss_position_now():

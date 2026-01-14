@@ -194,3 +194,17 @@ def conjunction_screen():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Screening failed: {str(e)}")
+
+@app.get("/api/v1/conjunctions/screen", tags=["defense"])
+def conjunction_screen():
+    """Tier-Zero Defense Conjunction Screening - Sovereign Asset Protection Focus"""
+    try:
+        result = screen_conjunctions()
+        return {
+            "system": "KoshaTrack SSA Engine v0.1.0-alpha",
+            "mission_directive": "iDEX ADITI - Tier-Zero Space Domain Awareness for India's Ministry of Defence",
+            "mumbai_to_orbit": "Operational from Maharashtra 🇮🇳",
+            **result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Defense screening failed: {str(e)}")
