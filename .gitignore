@@ -19,3 +19,7 @@ nohup.out
 *.out
 *.log
 .env
+nohup.out
+__pycache__/
+*.pyc
+.env
