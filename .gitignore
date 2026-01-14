@@ -14,3 +14,8 @@ __pycache__/
 *.log
 mission_logs.txt
 .venv/
+# Runtime logs/outputs
+nohup.out
+*.out
+*.log
+.env
