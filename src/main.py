@@ -33,18 +33,15 @@ except Exception as e:
 
 # SpaceTrack integration (Tier-Zero sovereign full catalog)
 try:
-    from .ssa_engine.data.spacetrack_client import is_available
-    SPACETRACK_AVAILABLE = is_available()
+        from .ssa_engine.data.spacetrack_client import is_available
+        SPACETRACK_AVAILABLE = is_available()
 except Exception as e:
-    print(f"Warning: SpaceTrack integration disabled: {e}")
-    SPACETRACK_AVAILABLE = False
+        print(f"Warning: SpaceTrack integration disabled: {e}")
+        SPACETRACK_AVAILABLE = False
 
 
-# SpaceTrack integration (Tier-Zero sovereign full catalog)
-try:
-except Exception as e:
-    print(f"Warning: SpaceTrack integration disabled: {e}")
-    SPACETRACK_AVAILABLE = False
+
+
 
 
 # SpaceTrack placeholder (keep for future)
