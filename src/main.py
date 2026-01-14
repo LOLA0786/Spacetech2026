@@ -169,3 +169,17 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
+
+@app.get("/api/v1/demo/iss_position")
+def demo_iss_position():
+    if not PROPAGATION_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Propagation engine not ready")
+    try:
+        result = get_iss_position_now()
+        return {
+            "success": True,
+            "data": result,
+            "note": "TLE fetched live from Celestrak (cached 5 min) with physics verification"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid TLE/physics check: {str(e)}")
