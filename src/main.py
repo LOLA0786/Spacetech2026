@@ -327,3 +327,13 @@ def visualize_indian_orbits():
     """Live black-space 3D orbit PNG - Indian sovereign assets in lime green (iDEX gold)"""
     image_bytes = generate_indian_orbits_plot()
     return StreamingResponse(BytesIO(image_bytes), media_type="image/png")
+
+from fastapi.responses import StreamingResponse
+
+from .ssa.report import generate_mod_briefing_pdf
+
+@app.get("/api/v1/report/mod_briefing.pdf", tags=["defense"])
+def mod_briefing_pdf():
+    """PDF briefing report for Ministry of Defence - risks + orbit visualization"""
+    pdf_bytes = generate_mod_briefing_pdf()
+    return StreamingResponse(BytesIO(pdf_bytes), media_type="application/pdf", headers={"Content-Disposition": "attachment; filename=koshatrack_mod_briefing.pdf"})
