@@ -7,6 +7,9 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+# Global tracking for demo
+last_propagation_time: str | None = None
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -130,6 +133,8 @@ def demo_iss_position():
         raise HTTPException(status_code=503, detail="Propagation engine not ready")
     try:
         result = get_iss_position_now()
+    global last_propagation_time
+    last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {"success": True, "iss_zarya": result}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid TLE/physics check: {str(e)}")
@@ -140,6 +145,8 @@ def custom_propagate(tle: TLEInput):
         raise HTTPException(status_code=503, detail="Propagation engine not ready")
     try:
         result = propagate_tle(tle.line1, tle.line2)
+    global last_propagation_time
+    last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {"success": True, "propagation": result}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Propagation failed: {str(e)}")
@@ -183,6 +190,8 @@ def demo_iss_position():
         raise HTTPException(status_code=503, detail="Propagation engine not ready")
     try:
         result = get_iss_position_now()
+    global last_propagation_time
+    last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {
             "success": True,
             "data": result,
@@ -223,6 +232,9 @@ def conjunction_screen():
 # At top with other imports
 from datetime import datetime
 
+# Global tracking for demo
+last_propagation_time: str | None = None
+
 # Add global for demo tracking (simple)
 last_propagation_time = None
 
@@ -249,3 +261,24 @@ def forecast_conjunctions(hours: int = Query(24, description="Forecast horizon i
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Forecast failed: {str(e)}")
+@app.get("/")
+def read_root():
+    return {
+        "name": "KoshaTrack SSA Engine",
+        "version": __version__,
+        "status": "operational",
+        "last_successful_propagation": last_propagation_time or "None yet",
+        "capabilities": {
+            "hpop_propagation": PROPAGATION_AVAILABLE,
+            "basic_sgp4_propagation": PROPAGATION_AVAILABLE,
+            "physics_verification": PROPAGATION_AVAILABLE,
+            "space_weather": True,
+            "spacetrack_integration": SPACETRACK_AVAILABLE,
+            "mht_tracking": False,
+            "hypersonic_detection": False,
+            "cislunar_tracking": False,
+            "predictive_forecast": True  # Now active with /forecast endpoint
+        },
+        "demo_note": "Custom TLE propagation + Indian asset screening fully operational",
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
