@@ -38,6 +38,9 @@ except Exception as e:
     PROPAGATION_AVAILABLE = False
 
 # SpaceTrack integration (Tier-Zero sovereign full catalog)
+
+# Clean FastAPI initialization
+
 try:
         from .ssa_engine.data.spacetrack_client import is_available
         SPACETRACK_AVAILABLE = is_available()
@@ -300,5 +303,5 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Live status tracking (FastAPI best practice - placed AFTER init)
+# Live status tracking (FastAPI best practice)
 app.state.last_propagation_time = None
