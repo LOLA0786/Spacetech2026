@@ -7,6 +7,9 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+# Global tracking for live status
+last_propagation_time: str | None = None
+
 # Global tracking for demo
 last_propagation_time: str | None = None
 
@@ -72,6 +75,7 @@ def read_root():
         "name": "KoshaTrack SSA Engine",
         "version": __version__,
         "status": "operational",
+        "last_successful_propagation": last_propagation_time or "None yet",
         "capabilities": {
             "hpop_propagation": PROPAGATION_AVAILABLE,
             "basic_sgp4_propagation": PROPAGATION_AVAILABLE,
@@ -135,6 +139,8 @@ def demo_iss_position():
         result = get_iss_position_now()
     global last_propagation_time
     last_propagation_time = datetime.utcnow().isoformat() + "Z"
+    global last_propagation_time
+    last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {"success": True, "iss_zarya": result}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid TLE/physics check: {str(e)}")
@@ -145,6 +151,8 @@ def custom_propagate(tle: TLEInput):
         raise HTTPException(status_code=503, detail="Propagation engine not ready")
     try:
         result = propagate_tle(tle.line1, tle.line2)
+    global last_propagation_time
+    last_propagation_time = datetime.utcnow().isoformat() + "Z"
     global last_propagation_time
     last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {"success": True, "propagation": result}
@@ -192,6 +200,8 @@ def demo_iss_position():
         result = get_iss_position_now()
     global last_propagation_time
     last_propagation_time = datetime.utcnow().isoformat() + "Z"
+    global last_propagation_time
+    last_propagation_time = datetime.utcnow().isoformat() + "Z"
         return {
             "success": True,
             "data": result,
@@ -232,6 +242,9 @@ def conjunction_screen():
 # At top with other imports
 from datetime import datetime
 
+# Global tracking for live status
+last_propagation_time: str | None = None
+
 # Global tracking for demo
 last_propagation_time: str | None = None
 
@@ -245,6 +258,7 @@ last_propagation_time = datetime.utcnow().isoformat() + "Z"
 # Update read_root() to include:
     "last_successful_propagation": last_propagation_time or "None yet",
     "demo_note": "Custom TLE propagation fully operational - physics verified"
+        "predictive_forecast": True,
 
 from fastapi import Query
 from .ssa.forecast import forecast_indian_threats
@@ -268,6 +282,7 @@ def read_root():
         "version": __version__,
         "status": "operational",
         "last_successful_propagation": last_propagation_time or "None yet",
+        "last_successful_propagation": last_propagation_time or "None yet",
         "capabilities": {
             "hpop_propagation": PROPAGATION_AVAILABLE,
             "basic_sgp4_propagation": PROPAGATION_AVAILABLE,
@@ -280,5 +295,6 @@ def read_root():
             "predictive_forecast": True  # Now active with /forecast endpoint
         },
         "demo_note": "Custom TLE propagation + Indian asset screening fully operational",
+        "predictive_forecast": True,
         "timestamp": datetime.utcnow().isoformat() + "Z"
     }
