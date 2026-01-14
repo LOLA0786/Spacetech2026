@@ -38,7 +38,7 @@ def generate_indian_orbits_plot() -> bytes:
     ax.set_ylabel('Y ECI (km)', color='white')
     ax.set_zlabel('Z ECI (km)', color='white')
     ax.tick_params(colors='white')
-    ax.set_title(f'KoshaTrack Tier-Zero Live Orbit View\n{dt.isoformat()}Z | Mumbai Command 🇮🇳', color='white', fontsize=14)
+    ax.set_title(f'KoshaTrack Tier-Zero Live Orbit View\n{dt.isoformat()}Z | Mumbai Command Center 🇮🇳', color='white', fontsize=14)
     ax.legend(loc='upper left', labelcolor='white')
     
     buf = BytesIO()

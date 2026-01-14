@@ -316,3 +316,14 @@ def visualize_indian_orbits():
     """Live 3D orbit visualization - Indian assets highlighted in lime green on black space background"""
     image_bytes = generate_indian_orbits_plot()
     return StreamingResponse(BytesIO(image_bytes), media_type="image/png")
+
+from fastapi.responses import StreamingResponse
+from io import BytesIO
+
+from .ssa.visualize import generate_indian_orbits_plot
+
+@app.get("/api/v1/visualize/indian_orbits", tags=["defense", "visualization"])
+def visualize_indian_orbits():
+    """Live black-space 3D orbit PNG - Indian sovereign assets in lime green (iDEX gold)"""
+    image_bytes = generate_indian_orbits_plot()
+    return StreamingResponse(BytesIO(image_bytes), media_type="image/png")
