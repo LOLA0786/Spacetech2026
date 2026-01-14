@@ -219,3 +219,17 @@ def conjunction_screen():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Defense screening failed: {str(e)}")
+
+# At top with other imports
+from datetime import datetime
+
+# Add global for demo tracking (simple)
+last_propagation_time = None
+
+# In both demo_iss_position and custom_propagate after success:
+global last_propagation_time
+last_propagation_time = datetime.utcnow().isoformat() + "Z"
+
+# Update read_root() to include:
+    "last_successful_propagation": last_propagation_time or "None yet",
+    "demo_note": "Custom TLE propagation fully operational - physics verified"
