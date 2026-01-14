@@ -10,4 +10,5 @@ sgp4
 # eth-account
 twilio
 requests==2.32.3
-spacetrack>=2.5
+spacetrack==1.4.0
+matplotlib==3.8.2

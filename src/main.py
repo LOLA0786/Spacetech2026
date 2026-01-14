@@ -305,3 +305,14 @@ app = FastAPI(
 
 # Live status tracking (FastAPI best practice)
 app.state.last_propagation_time = None
+
+from fastapi.responses import StreamingResponse
+from io import BytesIO
+
+from .ssa.visualize import generate_indian_orbits_plot
+
+@app.get("/api/v1/visualize/indian_orbits", tags=["defense", "visualization"])
+def visualize_indian_orbits():
+    """Live 3D orbit visualization - Indian assets highlighted in lime green on black space background"""
+    image_bytes = generate_indian_orbits_plot()
+    return StreamingResponse(BytesIO(image_bytes), media_type="image/png")
