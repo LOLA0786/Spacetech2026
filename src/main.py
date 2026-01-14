@@ -16,6 +16,17 @@ last_propagation_time: str | None = None
 from fastapi import FastAPI, HTTPException
 # FastAPI app initialization (clean 4-space indentation)
 
+app = FastAPI(
+    title="KoshaTrack SSA Engine",
+    description="Tier-Zero Sovereign Space Situational Awareness Platform",
+    version=__version__,
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
+
+# Live status tracking (FastAPI best practice)
+app.state.last_propagation_time = None
+
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -329,13 +340,3 @@ def mod_briefing_pdf():
     """PDF briefing report for Ministry of Defence - risks + orbit visualization"""
     pdf_bytes = generate_mod_briefing_pdf()
     return StreamingResponse(BytesIO(pdf_bytes), media_type="application/pdf", headers={"Content-Disposition": "attachment; filename=koshatrack_mod_briefing.pdf"})
-app = FastAPI(
-    title="KoshaTrack SSA Engine",
-    description="Tier-Zero Sovereign Space Situational Awareness Platform",
-    version=__version__,
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
-
-# Live status tracking (FastAPI best practice)
-app.state.last_propagation_time = None
