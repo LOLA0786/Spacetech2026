@@ -233,3 +233,19 @@ last_propagation_time = datetime.utcnow().isoformat() + "Z"
 # Update read_root() to include:
     "last_successful_propagation": last_propagation_time or "None yet",
     "demo_note": "Custom TLE propagation fully operational - physics verified"
+
+from fastapi import Query
+from .ssa.forecast import forecast_indian_threats
+
+@app.get("/api/v1/conjunctions/forecast", tags=["defense"])
+def forecast_conjunctions(hours: int = Query(24, description="Forecast horizon in hours"), steps: int = Query(24, description="Prediction steps")):
+    """Predictive Conjunction Forecasting - Focused on Indian Sovereign Asset Protection"""
+    try:
+        result = forecast_indian_threats(hours=hours, steps=steps)
+        return {
+            "system": "KoshaTrack SSA Engine - Predictive Defense Mode",
+            "directive": "iDEX ADITI Advance Warning System",
+            **result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Forecast failed: {str(e)}")
