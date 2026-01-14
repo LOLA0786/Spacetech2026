@@ -16,6 +16,7 @@ last_propagation_time: str | None = None
 from fastapi import FastAPI, HTTPException
 # FastAPI app initialization (clean 4-space indentation)
 
+# FastAPI app initialization (clean 4-space indentation)
 app = FastAPI(
     title="KoshaTrack SSA Engine",
     description="Tier-Zero Sovereign Space Situational Awareness Platform",
@@ -26,7 +27,6 @@ app = FastAPI(
 
 # Live status tracking (FastAPI best practice)
 app.state.last_propagation_time = None
-
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
