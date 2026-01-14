@@ -183,3 +183,18 @@ def demo_iss_position():
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid TLE/physics check: {str(e)}")
+
+from .ssa.screening import screen_conjunctions
+
+@app.get("/api/v1/conjunctions/screen")
+def conjunction_screen():
+    """Defense-grade conjunction screening endpoint"""
+    try:
+        result = screen_conjunctions()
+        return {
+            "system": "KoshaTrack SSA Engine - Tier-Zero Sovereign SSA",
+            "mission": "Early warning for India's space domain security (iDEX ADITI)",
+            **result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Screening failed: {str(e)}")
