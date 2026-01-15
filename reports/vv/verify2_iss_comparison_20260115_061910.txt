@@ -1,0 +1,20 @@
+Running legacy (two-body + J2)...
+Running full HPOP (constant SRP + zonals)...
+
+Day   | Legacy Alt (km) | Full Alt (km) | Diff (m)  | Zone
+------|-----------------|----------------|-----------|----------------
+ 0.0  |       418.80   |       418.80   |       +0   | Trust match (<100m)
+ 0.6  |       418.76   |       418.64   |     -115   | Enhanced realism (SRP push)
+ 1.2  |       418.64   |       418.41   |     -227   | Enhanced realism (SRP push)
+ 1.7  |       418.45   |       418.12   |     -334   | Enhanced realism (SRP push)
+ 2.3  |       418.19   |       417.76   |     -433   | Enhanced realism (SRP push)
+ 2.9  |       417.87   |       417.35   |     -521   | Enhanced realism (SRP push)
+ 3.5  |       417.51   |       416.91   |     -595   | Enhanced realism (SRP push)
+ 4.1  |       417.10   |       416.44   |     -654   | Enhanced realism (SRP push)
+ 4.6  |       416.66   |       415.97   |     -696   | Enhanced realism (SRP push)
+ 5.2  |       416.21   |       415.49   |     -718   | Enhanced realism (SRP push)
+ 5.8  |       415.76   |       415.04   |     -719   | Enhanced realism (SRP push)
+ 6.4  |       415.31   |       414.61   |     -698   | Enhanced realism (SRP push)
+ 7.0  |       414.87   |       414.22   |     -654   | Enhanced realism (SRP push)
+
+Locked stable! Screenshot this — green trust zone (0-3 days), blue enhanced (4+ days). iDEX will eat this up.
