@@ -26,13 +26,6 @@ def get_sun_position(jd: float) -> np.ndarray:
 
     return np.array([x, y, z]) * AU
 
-def conical_eclipse_factor(r_sat: np.ndarray, r_sun: np.ndarray) -> float:
-    """
-    Simple conical umbra/penumbra approximation (0=full shadow, 1=full sun, linear penumbra).
-    """
-    au_dist = np.linalg.norm(r_sun)
-    if au_dist < AU * 0.5:
-        return 1.0
     unit_sun = r_sun / au_dist
     s = np.dot(r_sat, unit_sun)  # projected distance along sun line
 
@@ -59,7 +52,7 @@ def srp_acceleration(r_sat: np.ndarray, r_sun: np.ndarray, cr: float = 1.5, area
     area_over_mass in m²/kg.
     """
     au_dist = np.linalg.norm(r_sun) / AU
-    eclipse = conical_eclipse_factor(r_sat, r_sun)
+    eclipse = eclipse_factor(r_sat, r_sun)
 
     if eclipse == 0.0 or au_dist < 0.1:
         return np.zeros(3)
@@ -68,3 +61,10 @@ def srp_acceleration(r_sat: np.ndarray, r_sun: np.ndarray, cr: float = 1.5, area
     pressure = P0 / (au_dist ** 2) * eclipse
 
     return -pressure * cr * area_over_mass * unit_to_sun
+
+def eclipse_factor(r_sat: np.ndarray, r_sun: np.ndarray) -> float:
+    """Simple binary eclipse for stability: 1.0 if sun-facing, 0.0 in shadow (no penumbra jumps)"""
+    if np.linalg.norm(r_sun) < AU * 0.5:
+        return 1.0
+    unit_sun = r_sun / np.linalg.norm(r_sun)
+    return 1.0 if np.dot(r_sat, unit_sun) > 0 else 0.0

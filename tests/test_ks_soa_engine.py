@@ -19,7 +19,7 @@ import os
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.ssa_engine import (
+from src.ssa_engine import (
     KoshaTrackSSA, SatelliteState, OrbitRegime
 )
 from core.tle_manager import (
