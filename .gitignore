@@ -23,3 +23,12 @@ nohup.out
 __pycache__/
 *.pyc
 .env
+
+# Runtime / temp
+nohup.out
+*.log
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
